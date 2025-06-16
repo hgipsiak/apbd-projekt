@@ -18,7 +18,7 @@ namespace projekt.Controllers
         }
 
         [HttpPost("addPerson")]
-        public async Task<IActionResult> AddNewPerson(AddPersonClientDto dto)
+        public async Task<IActionResult> AddNewPerson(PersonClientDto dto)
         {
             try
             {
@@ -28,6 +28,38 @@ namespace projekt.Controllers
             catch (ConflictException e)
             {
                 return Conflict(e.Message);
+            }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("updatePerson/{idPerson}")]
+        public async Task<IActionResult> UpdatePerson(int idPerson, PersonClientDto dto)
+        {
+            try
+            {
+                await _dbService.UpdatePerson(idPerson, dto);
+                return Ok("Person updated");
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpDelete("deletePerson/{idPerson}")]
+        public async Task<IActionResult> DeletePerson(int idPerson)
+        {
+            try
+            {
+                await _dbService.DeletePerson(idPerson);
+                return Ok("Person deleted");
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
             }
         }
     }

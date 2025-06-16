@@ -29,6 +29,8 @@ public class DatabaseContext : DbContext
             c.Property(e => e.Email).HasMaxLength(50).IsRequired();
             c.Property(e => e.PhoneNumber).HasMaxLength(9).IsRequired();
         });
+        
+        modelBuilder.Entity<Client>().HasQueryFilter(c => c.DeletionDate == null);
 
         modelBuilder.Entity<Person>(p =>
         {
