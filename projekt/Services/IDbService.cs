@@ -8,4 +8,6 @@ public interface IDbService
     Task AddNewPerson(PersonClientDto dto);
     Task UpdatePerson(int id, PersonClientDto dto);
     Task DeletePerson(int id);
+    Task AddNewCompany(CompanyClientDto dto);
+    Task UpdateCompany(int id, CompanyClientDto dto);
 }

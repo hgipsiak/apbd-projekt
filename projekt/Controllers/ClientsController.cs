@@ -47,6 +47,10 @@ namespace projekt.Controllers
             {
                 return NotFound(e.Message);
             }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpDelete("deletePerson/{idPerson}")]
@@ -60,6 +64,42 @@ namespace projekt.Controllers
             catch (NotFoundException e)
             {
                 return NotFound(e.Message);
+            }
+        }
+
+        [HttpPost("addCompany")]
+        public async Task<IActionResult> AddNewCompany(CompanyClientDto dto)
+        {
+            try
+            {
+                await _dbService.AddNewCompany(dto);
+                return Created("newCompany", dto);
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
+            }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("updateCompany/{idCompany}")]
+        public async Task<IActionResult> UpdateCompany(int idCompany, CompanyClientDto dto)
+        {
+            try
+            {
+                await _dbService.UpdateCompany(idCompany, dto);
+                return Ok("Company updated");
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
             }
         }
     }
