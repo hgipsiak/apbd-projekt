@@ -81,6 +81,11 @@ public class DbService : IDbService
             {
                 throw new BadRequestException("Phone number must be 9 digits");
             }
+            
+            if (!int.TryParse(dto.PhoneNumber, out int number))
+            {
+                throw new BadRequestException("Phone number contains onvalid characters");
+            }
 
             await _context.Clients.Where(e => e.IdClient == id)
                 .ExecuteUpdateAsync(setters =>
@@ -138,6 +143,11 @@ public class DbService : IDbService
         {
             throw new BadRequestException("Krs must be 10 digits");
         }
+        
+        if (!int.TryParse(dto.PhoneNumber, out int number) || !long.TryParse(dto.Krs, out long krs))
+        {
+            throw new BadRequestException("Phone number or krs contains invalid characters");
+        }
 
         var company = new Company()
         {
@@ -168,6 +178,11 @@ public class DbService : IDbService
             if (dto.PhoneNumber.Length != 9)
             {
                 throw new BadRequestException("Phone number must be 9 digits");
+            }
+
+            if (!int.TryParse(dto.PhoneNumber, out int number))
+            {
+                throw new BadRequestException("Phone number contains onvalid characters");
             }
 
             await _context.Clients.Where(e => e.IdClient == id)
