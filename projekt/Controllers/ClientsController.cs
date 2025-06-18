@@ -102,5 +102,27 @@ namespace projekt.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("createPayment/{idClient}/software/{idSoftware}")]
+        public async Task<IActionResult> AddPaymentToClient(int idClient, int idSoftware, PaymentDto dto)
+        {
+            try
+            {
+                await _dbService.CreatePayment(idClient, idSoftware, dto);
+                return Created("newPayment", dto);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
+            }
+        }
     }
 }

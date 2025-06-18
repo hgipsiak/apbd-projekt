@@ -12,8 +12,8 @@ using projekt.Data;
 namespace projekt.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250617172651_Update2")]
-    partial class Update2
+    [Migration("20250618151206_Update1")]
+    partial class Update1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,50 @@ namespace projekt.Migrations
                     b.ToTable("Client", (string)null);
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("projekt.Models.Contract", b =>
+                {
+                    b.Property<int>("ContractId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContractId"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("InstalmentsQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsInstalment")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SoftwareId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SoftwareVersion")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("UpdateYears")
+                        .HasColumnType("int");
+
+                    b.HasKey("ContractId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("SoftwareId");
+
+                    b.ToTable("Contract", (string)null);
                 });
 
             modelBuilder.Entity("projekt.Models.Discount", b =>
@@ -102,7 +146,33 @@ namespace projekt.Migrations
 
                     b.HasIndex("SoftwareId");
 
-                    b.ToTable("DiscountOperatingSystem", (string)null);
+                    b.ToTable("DiscountSoftware", (string)null);
+                });
+
+            modelBuilder.Entity("projekt.Models.Payment", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+
+                    b.Property<int>("ContractId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("PaymentId");
+
+                    b.HasIndex("ContractId");
+
+                    b.ToTable("Payment", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("projekt.Models.Software", b =>
@@ -128,12 +198,15 @@ namespace projekt.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<decimal>("Version")
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("SoftwareId");
 
-                    b.ToTable("OperatingSystem", (string)null);
+                    b.ToTable("Software", (string)null);
                 });
 
             modelBuilder.Entity("projekt.Models.Company", b =>
@@ -175,6 +248,38 @@ namespace projekt.Migrations
                     b.ToTable("Person", (string)null);
                 });
 
+            modelBuilder.Entity("projekt.Models.Instalment", b =>
+                {
+                    b.HasBaseType("projekt.Models.Payment");
+
+                    b.Property<DateTime>("DueTo")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("InstalmentNumber")
+                        .HasColumnType("int");
+
+                    b.ToTable("Instalment", (string)null);
+                });
+
+            modelBuilder.Entity("projekt.Models.Contract", b =>
+                {
+                    b.HasOne("projekt.Models.Client", "Client")
+                        .WithMany("Contracts")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("projekt.Models.Software", "Software")
+                        .WithMany("Contracts")
+                        .HasForeignKey("SoftwareId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Software");
+                });
+
             modelBuilder.Entity("projekt.Models.DiscountSoftware", b =>
                 {
                     b.HasOne("projekt.Models.Discount", "Discount")
@@ -192,6 +297,17 @@ namespace projekt.Migrations
                     b.Navigation("Discount");
 
                     b.Navigation("Software");
+                });
+
+            modelBuilder.Entity("projekt.Models.Payment", b =>
+                {
+                    b.HasOne("projekt.Models.Contract", "Contract")
+                        .WithMany("Payments")
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Contract");
                 });
 
             modelBuilder.Entity("projekt.Models.Company", b =>
@@ -212,6 +328,25 @@ namespace projekt.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("projekt.Models.Instalment", b =>
+                {
+                    b.HasOne("projekt.Models.Payment", null)
+                        .WithOne()
+                        .HasForeignKey("projekt.Models.Instalment", "PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("projekt.Models.Client", b =>
+                {
+                    b.Navigation("Contracts");
+                });
+
+            modelBuilder.Entity("projekt.Models.Contract", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
             modelBuilder.Entity("projekt.Models.Discount", b =>
                 {
                     b.Navigation("DiscountSoftwares");
@@ -219,6 +354,8 @@ namespace projekt.Migrations
 
             modelBuilder.Entity("projekt.Models.Software", b =>
                 {
+                    b.Navigation("Contracts");
+
                     b.Navigation("DiscountSoftwares");
                 });
 #pragma warning restore 612, 618

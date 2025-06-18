@@ -8,4 +8,6 @@ public abstract class Client
     public string PhoneNumber { get; set; }
     
     public DateTime? DeletionDate { get; set; }
+    
+    public ICollection<Contract> Contracts { get; set; }
 }

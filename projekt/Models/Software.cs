@@ -7,6 +7,9 @@ public class Software
     public string Description { get; set; }
     public decimal Version { get; set; }
     public string Category { get; set; }
+    public decimal Price { get; set; }
     
     public ICollection<DiscountSoftware> DiscountSoftwares { get; set; }
+    
+    public ICollection<Contract> Contracts { get; set; }
 }

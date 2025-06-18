@@ -10,4 +10,5 @@ public interface IDbService
     Task DeletePerson(int id);
     Task AddNewCompany(CompanyClientDto dto);
     Task UpdateCompany(int id, CompanyClientDto dto);
+    Task CreatePayment(int clientId, int softwareId, PaymentDto dto);
 }

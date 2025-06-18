@@ -205,4 +205,71 @@ public class DbService : IDbService
             throw;
         }
     }
+
+    public async Task CreatePayment(int clientId, int softwareId, PaymentDto dto)
+    {
+        var client = await _context.Clients.FirstOrDefaultAsync(e => e.IdClient == clientId);
+        if (client == null)
+        {
+            throw new NotFoundException("Client not found");
+        }
+        var software = await _context.Softwares.FirstOrDefaultAsync(e => e.SoftwareId == softwareId
+        && e.Version == dto.SoftwareVersion);
+        if (software == null)
+        {
+            throw new NotFoundException("Software not found");
+        }
+        var exists = await _context.Contracts
+            .FirstOrDefaultAsync(e => e.ClientId == clientId && e.SoftwareId == softwareId && e.SoftwareId == softwareId);
+        var returningClient = false;
+        if (exists != null && exists.EndDate > DateTime.Now)
+        {
+            throw new ConflictException("Payment on this software already exists");
+        } else if (exists != null)
+        {
+            returningClient = true;
+        }
+        
+        if ((dto.EndDate - dto.StartDate).Days < 3 || (dto.EndDate - dto.StartDate).Days > 30)
+        {
+            throw new BadRequestException("Difference between start and end dates must be between 3 and 30 days");
+        }
+
+        var discounts = await _context.Discounts.Where(e => e.DiscountId == dto.SoftwareId
+        && dto.StartDate < e.ToDate).ToListAsync();
+        var maxDiscount = discounts.Max(e => e.Value);
+
+        if (returningClient)
+        {
+            maxDiscount += 0.05m;
+        }
+
+        if (dto.UpdateYears < 1 && dto.UpdateYears > 4)
+        {
+            throw new BadRequestException("UpdateYears must be between 1 and 4 years");
+        }
+
+        var discountPrice = (software.Price + (dto.UpdateYears - 1) * 1000) - (software.Price + (dto.UpdateYears - 1) * 1000) * maxDiscount;
+
+        var payment = new Contract()
+        {
+            ClientId = clientId,
+            SoftwareId = softwareId,
+            StartDate = dto.StartDate,
+            EndDate = dto.EndDate,
+            TotalPrice = discountPrice,
+            UpdateYears = dto.UpdateYears,
+            SoftwareVersion = software.Version,
+            IsInstalment = false
+        };
+
+        if (dto.IsInstalment)
+        {
+            payment.IsInstalment = true;
+            payment.InstalmentsQuantity = dto.InstalmentNumber;
+        }
+        
+        await _context.Contracts.AddAsync(payment);
+        await _context.SaveChangesAsync();
+    }
 }

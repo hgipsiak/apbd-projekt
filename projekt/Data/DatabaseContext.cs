@@ -8,9 +8,12 @@ public class DatabaseContext : DbContext
     public DbSet<Client> Clients { get; set; }
     public DbSet<Person> Persons { get; set; }
     public DbSet<Company> Companies { get; set; }
-    public DbSet<Software> OperatingSystems { get; set; }
+    public DbSet<Software> Softwares { get; set; }
     public DbSet<Discount> Discounts { get; set; }
-    public DbSet<DiscountSoftware> DiscountOperatingSystems { get; set; }
+    public DbSet<DiscountSoftware> DiscountSoftwares { get; set; }
+    public DbSet<Contract> Contracts { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Instalment> Instalments { get; set; }
 
     protected DatabaseContext()
     {
@@ -54,13 +57,14 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<Software>(op =>
         {
-            op.ToTable("OperatingSystem");
+            op.ToTable("Software");
 
             op.HasKey(e => e.SoftwareId);
             op.Property(e => e.Name).IsRequired().HasMaxLength(50);
             op.Property(e => e.Version).IsRequired().HasColumnType("decimal(10,2)");
             op.Property(e => e.Description).IsRequired().HasMaxLength(200);
             op.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            op.Property(e => e.Price).IsRequired().HasColumnType("decimal(10,2)");
         });
 
         modelBuilder.Entity<Discount>(d =>
@@ -78,9 +82,40 @@ public class DatabaseContext : DbContext
 
         modelBuilder.Entity<DiscountSoftware>(dos =>
         {
-            dos.ToTable("DiscountOperatingSystem");
+            dos.ToTable("DiscountSoftware");
 
-            dos.HasKey(e => new { e.DiscountId, OperatingSystemId = e.SoftwareId });
+            dos.HasKey(e => new { e.DiscountId, e.SoftwareId });
+        });
+
+        modelBuilder.Entity<Contract>(c =>
+        {
+            c.ToTable("Contract");
+
+            c.HasKey(e => e.ContractId);
+            c.Property(e => e.StartDate).IsRequired().HasColumnType("datetime");
+            c.Property(e => e.EndDate).IsRequired().HasColumnType("datetime");
+            c.Property(e => e.TotalPrice).IsRequired().HasColumnType("decimal(10,2)");
+            c.Property(e => e.UpdateYears).IsRequired();
+            c.Property(e => e.SoftwareVersion).IsRequired().HasColumnType("decimal(10,2)");
+            c.Property(e => e.IsInstalment).IsRequired();
+            c.Property(e => e.InstalmentsQuantity);
+        });
+
+        modelBuilder.Entity<Payment>(p =>
+        {
+            p.ToTable("Payment");
+
+            p.HasKey(e => e.PaymentId);
+            p.Property(e => e.PaymentDate).IsRequired().HasColumnType("datetime");
+            p.Property(e => e.Price).IsRequired().HasColumnType("decimal(10,2)");
+        });
+
+        modelBuilder.Entity<Instalment>(i =>
+        {
+            i.ToTable("Instalment");
+
+            i.Property(e => e.InstalmentNumber).IsRequired();
+            i.Property(e => e.DueTo).HasColumnType("datetime");
         });
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using projekt.Data;
 
@@ -11,9 +12,11 @@ using projekt.Data;
 namespace projekt.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250618150805_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,6 +261,13 @@ namespace projekt.Migrations
                     b.ToTable("Instalment", (string)null);
                 });
 
+            modelBuilder.Entity("projekt.Models.SinglePayment", b =>
+                {
+                    b.HasBaseType("projekt.Models.Payment");
+
+                    b.ToTable("SinglePayment", (string)null);
+                });
+
             modelBuilder.Entity("projekt.Models.Contract", b =>
                 {
                     b.HasOne("projekt.Models.Client", "Client")
@@ -330,6 +340,15 @@ namespace projekt.Migrations
                     b.HasOne("projekt.Models.Payment", null)
                         .WithOne()
                         .HasForeignKey("projekt.Models.Instalment", "PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("projekt.Models.SinglePayment", b =>
+                {
+                    b.HasOne("projekt.Models.Payment", null)
+                        .WithOne()
+                        .HasForeignKey("projekt.Models.SinglePayment", "PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
