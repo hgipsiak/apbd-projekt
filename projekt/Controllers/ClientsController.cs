@@ -103,13 +103,49 @@ namespace projekt.Controllers
             }
         }
 
-        [HttpPost("createPayment/{idClient}/software/{idSoftware}")]
-        public async Task<IActionResult> AddPaymentToClient(int idClient, int idSoftware, PaymentDto dto)
+        [HttpPost("createContract/{idClient}/software/{idSoftware}")]
+        public async Task<IActionResult> AddContractToClient(int idClient, int idSoftware, PaymentDto dto)
         {
             try
             {
-                await _dbService.CreatePayment(idClient, idSoftware, dto);
+                await _dbService.CreateContract(idClient, idSoftware, dto);
                 return Created("newPayment", dto);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(e.Message);
+            }
+        }
+
+        [HttpDelete("deleteContract/{idContract}")]
+        public async Task<IActionResult> DeleteContract(int idContract)
+        {
+            try
+            {
+                await _dbService.DeleteContract(idContract);
+                return Ok("Contract deleted");
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpPost("payContract/{idContract}")]
+        public async Task<IActionResult> PayContract(int idContract)
+        {
+            try
+            {
+                await _dbService.PayContract(idContract);
+                return Created("newPayment", "Payment created");
             }
             catch (NotFoundException e)
             {

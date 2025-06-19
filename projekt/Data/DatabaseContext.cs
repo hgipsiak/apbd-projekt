@@ -98,6 +98,7 @@ public class DatabaseContext : DbContext
             c.Property(e => e.UpdateYears).IsRequired();
             c.Property(e => e.SoftwareVersion).IsRequired().HasColumnType("decimal(10,2)");
             c.Property(e => e.IsInstalment).IsRequired();
+            c.Property(e => e.IsFulfilled).IsRequired();
             c.Property(e => e.InstalmentsQuantity);
         });
 
@@ -115,7 +116,6 @@ public class DatabaseContext : DbContext
             i.ToTable("Instalment");
 
             i.Property(e => e.InstalmentNumber).IsRequired();
-            i.Property(e => e.DueTo).HasColumnType("datetime");
         });
     }
 }

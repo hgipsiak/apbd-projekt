@@ -11,6 +11,7 @@ public class Contract
     public int UpdateYears { get; set; }
     public decimal SoftwareVersion { get; set; }
     public bool IsInstalment { get; set; }
+    public bool IsFulfilled { get; set; }
     public int? InstalmentsQuantity { get; set; }
     
     [ForeignKey(nameof(Client))]
