@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using projekt.Models;
 
 namespace projekt.Data;
 
-public class DatabaseContext : DbContext
+public class DatabaseContext : IdentityDbContext<IdentityUser>
 {
     public DbSet<Client> Clients { get; set; }
     public DbSet<Person> Persons { get; set; }
@@ -19,12 +21,14 @@ public class DatabaseContext : DbContext
     {
     }
 
-    public DatabaseContext(DbContextOptions options) : base(options)
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<Client>(c =>
         {
             c.ToTable("Client");

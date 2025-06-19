@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using projekt.DTOs;
@@ -8,6 +9,7 @@ namespace projekt.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Regular")]
     public class ProfitsController : ControllerBase
     {
         private readonly IDbService _dbService;
