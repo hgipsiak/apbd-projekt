@@ -10,7 +10,8 @@ public interface IDbService
     Task DeletePerson(int id);
     Task AddNewCompany(CompanyClientDto dto);
     Task UpdateCompany(int id, CompanyClientDto dto);
-    Task CreateContract(int clientId, int softwareId, PaymentDto dto);
+    Task CreateContract(int clientId, int softwareId, ContractDto dto);
     Task PayContract(int contractId);
     Task DeleteContract(int contractId);
+    Task<GetProfitDto> CalculateProfit(string currencyCode, int? softwareId = null);
 }

@@ -18,7 +18,7 @@ namespace projekt.Controllers
         }
         
         [HttpPost("createContract/{idClient}/software/{idSoftware}")]
-        public async Task<IActionResult> AddContractToClient(int idClient, int idSoftware, PaymentDto dto)
+        public async Task<IActionResult> AddContractToClient(int idClient, int idSoftware, ContractDto dto)
         {
             try
             {

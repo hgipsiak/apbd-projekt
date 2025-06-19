@@ -1,0 +1,38 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using projekt.DTOs;
+using projekt.Exceptions;
+using projekt.Services;
+
+namespace projekt.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ProfitsController : ControllerBase
+    {
+        private readonly IDbService _dbService;
+
+        public ProfitsController(IDbService dbService)
+        {
+            _dbService = dbService;
+        }
+
+        [HttpGet("{currencyCode}")]
+        public async Task<IActionResult> GetProfit(string currencyCode, [FromQuery] int? softwareId = null)
+        {
+            try
+            {
+                GetProfitDto res = await _dbService.CalculateProfit(currencyCode, softwareId);
+                return Ok(res);
+            }
+            catch (BadRequestException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+    }
+}

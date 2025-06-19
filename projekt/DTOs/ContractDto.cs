@@ -1,6 +1,6 @@
 ﻿namespace projekt.DTOs;
 
-public class PaymentDto
+public class ContractDto
 {
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }

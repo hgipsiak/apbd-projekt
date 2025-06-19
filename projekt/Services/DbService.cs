@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using projekt.Data;
 using projekt.DTOs;
@@ -10,10 +11,12 @@ namespace projekt.Services;
 public class DbService : IDbService
 {
     private readonly DatabaseContext _context;
+    private readonly HttpClient _httpClient;
 
-    public DbService(DatabaseContext context)
+    public DbService(DatabaseContext context, HttpClient httpClient)
     {
         _context = context;
+        _httpClient = httpClient;
     }
 
     public async Task AddNewPerson(PersonClientDto dto)
@@ -206,7 +209,7 @@ public class DbService : IDbService
         }
     }
 
-    public async Task CreateContract(int clientId, int softwareId, PaymentDto dto)
+    public async Task CreateContract(int clientId, int softwareId, ContractDto dto)
     {
         var client = await _context.Clients.FirstOrDefaultAsync(e => e.IdClient == clientId);
         if (client == null)
@@ -215,11 +218,10 @@ public class DbService : IDbService
         }
         var software = await _context.Softwares.FirstOrDefaultAsync(e => e.SoftwareId == softwareId
         && e.Version == dto.SoftwareVersion);
-        if (software == null)
+        if (software == null || software.Version != dto.SoftwareVersion)
         {
             throw new NotFoundException("Software not found");
         }
-
         if (dto.EndDate < dto.StartDate)
         {
             throw new ConflictException("End date cannot be before start date");
@@ -360,4 +362,62 @@ public class DbService : IDbService
         await _context.Contracts.Where(e => e.ContractId == contractId).ExecuteDeleteAsync();
         await _context.SaveChangesAsync();
     }
+
+    public async Task<GetProfitDto> CalculateProfit(string currencyCode, int? softwareId = null)
+    {
+        List<Contract> contracts;
+        if (softwareId == null)
+        {
+            contracts = await _context.Contracts.Where(e => e.IsFulfilled)
+                .Include(e => e.Software).ToListAsync();
+        }
+        else
+        {
+            contracts = await _context.Contracts.Where(e => e.IsFulfilled && e.SoftwareId == softwareId)
+                .Include(e => e.Software).ToListAsync();
+        }
+        var grouped = contracts.GroupBy(e => e.Software).ToList();
+        var res = new GetProfitDto()
+        {
+            CurrencyCode = currencyCode,
+            Sum = contracts.Sum(e => e.TotalPrice),
+            Softwares = grouped.Select(e => new GetSoftwareDto()
+            {
+                SoftwareId = e.Key.SoftwareId,
+                SoftwareName = e.Key.Name,
+                Contracts = e.Select(c => new GetContractDto()
+                {
+                    ContractId = c.ContractId,
+                    TotalPrice = c.TotalPrice,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate
+                }).ToList()
+            }).ToList()
+        };
+        if (currencyCode.ToUpper() == "PLN") return res;
+
+        var url = $"https://api.nbp.pl/api/exchangerates/rates/a/{currencyCode}/?format=json";
+        var response = await _httpClient.GetAsync(url);
+        if (!response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound)
+        {
+            throw new NotFoundException("Invalid request");
+        }
+
+        var rateItem = response.Content.ReadFromJsonAsync<GetNBPDto>().Result;
+        var rate = rateItem.Rates.FirstOrDefault().Mid;
+
+        res.Sum /= rate;
+        res.Sum = decimal.Round(res.Sum, 2);
+        foreach (var software in res.Softwares)
+        {
+            foreach (var contract in software.Contracts)
+            {
+                contract.TotalPrice /= rate;
+                contract.TotalPrice = decimal.Round(contract.TotalPrice, 2);
+            }
+        }
+        return res;
+    }
+    
 }
+
