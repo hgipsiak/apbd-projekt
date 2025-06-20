@@ -12,11 +12,11 @@ namespace projekt.Controllers
     [Authorize(Roles = "Admin")]
     public class ClientsController : ControllerBase
     {
-        private readonly IDbService _dbService;
+        private readonly IClientsService _clientsService;
 
-        public ClientsController(IDbService dbService)
+        public ClientsController(IClientsService clientsService)
         {
-            _dbService = dbService;
+            _clientsService = clientsService;
         }
 
         [HttpPost("addPerson")]
@@ -24,7 +24,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.AddNewPerson(dto);
+                await _clientsService.AddNewPerson(dto);
                 return Created("newPerson", dto);
             }
             catch (ConflictException e)
@@ -42,7 +42,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.UpdatePerson(idPerson, dto);
+                await _clientsService.UpdatePerson(idPerson, dto);
                 return Ok("Person updated");
             }
             catch (NotFoundException e)
@@ -60,7 +60,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.DeletePerson(idPerson);
+                await _clientsService.DeletePerson(idPerson);
                 return Ok("Person deleted");
             }
             catch (NotFoundException e)
@@ -74,7 +74,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.AddNewCompany(dto);
+                await _clientsService.AddNewCompany(dto);
                 return Created("newCompany", dto);
             }
             catch (ConflictException e)
@@ -92,7 +92,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.UpdateCompany(idCompany, dto);
+                await _clientsService.UpdateCompany(idCompany, dto);
                 return Ok("Company updated");
             }
             catch (NotFoundException e)

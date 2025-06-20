@@ -36,8 +36,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.SlidingExpiration = true;
 });
-builder.Services.AddScoped<IDbService, DbService>();
-builder.Services.AddHttpClient<DbService>();
+builder.Services.AddScoped<IClientsService, ClientsService>();
+builder.Services.AddScoped<IContractsService, ContractsService>();
+builder.Services.AddScoped<IProfitsService, ProfitsService>();
+builder.Services.AddHttpClient<ProfitsService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

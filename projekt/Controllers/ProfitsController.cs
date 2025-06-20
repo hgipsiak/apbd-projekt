@@ -12,11 +12,11 @@ namespace projekt.Controllers
     [Authorize(Roles = "Admin,Regular")]
     public class ProfitsController : ControllerBase
     {
-        private readonly IDbService _dbService;
+        private readonly IProfitsService _profitsService;
 
-        public ProfitsController(IDbService dbService)
+        public ProfitsController(IProfitsService profitsService)
         {
-            _dbService = dbService;
+            _profitsService = profitsService;
         }
 
         [HttpGet("{currencyCode}")]
@@ -24,7 +24,7 @@ namespace projekt.Controllers
         {
             try
             {
-                GetProfitDto res = await _dbService.CalculateProfit(currencyCode, softwareId);
+                GetProfitDto res = await _profitsService.CalculateProfit(currencyCode, softwareId);
                 return Ok(res);
             }
             catch (BadRequestException e)

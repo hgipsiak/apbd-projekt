@@ -12,11 +12,11 @@ namespace projekt.Controllers
     [Authorize(Roles = "Admin,Regular")]
     public class ContractsController : ControllerBase
     {
-        private readonly IDbService _dbService;
+        private readonly IContractsService _contractsService;
 
-        public ContractsController(IDbService dbService)
+        public ContractsController(IContractsService contractsService)
         {
-            _dbService = dbService;
+            _contractsService = contractsService;
         }
         
         [HttpPost("createContract/{idClient}/software/{idSoftware}")]
@@ -24,7 +24,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.CreateContract(idClient, idSoftware, dto);
+                await _contractsService.CreateContract(idClient, idSoftware, dto);
                 return Created("newPayment", dto);
             }
             catch (NotFoundException e)
@@ -46,7 +46,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.DeleteContract(idContract);
+                await _contractsService.DeleteContract(idContract);
                 return Ok("Contract deleted");
             }
             catch (NotFoundException e)
@@ -60,7 +60,7 @@ namespace projekt.Controllers
         {
             try
             {
-                await _dbService.PayContract(idContract);
+                await _contractsService.PayContract(idContract);
                 return Created("newPayment", "Payment created");
             }
             catch (NotFoundException e)
