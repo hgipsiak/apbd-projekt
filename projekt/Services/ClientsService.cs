@@ -36,6 +36,10 @@ public class ClientsService : IClientsService
             throw new BadRequestException("Pesel must be 11 digits");
         }
 
+        if (!int.TryParse(dto.PhoneNumber, out int number) || !long.TryParse(dto.Pesel, out long pesel))
+        {
+            throw new BadRequestException("Phone number or pesel contains invalid characters");
+        }
 
         int[] wagi = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
         int suma = 0;
@@ -183,7 +187,7 @@ public class ClientsService : IClientsService
 
             if (!int.TryParse(dto.PhoneNumber, out int number))
             {
-                throw new BadRequestException("Phone number contains onvalid characters");
+                throw new BadRequestException("Phone number contains invalid characters");
             }
 
             await _context.Clients.Where(e => e.IdClient == id)

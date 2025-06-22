@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
@@ -13,15 +14,21 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
     </ItemGroup>
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="UnitTests\obj\project.assets.json" />
       <_ContentIncludedByDefault Remove="UnitTests\obj\project.packagespec.json" />
       <_ContentIncludedByDefault Remove="UnitTests\obj\UnitTests.csproj.nuget.dgspec.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="UnitTests\obj\Debug\" />
     </ItemGroup>
 
 </Project>
